@@ -1,0 +1,187 @@
+
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>电子发票</title>
+    <link rel="stylesheet" type="text/css" href="/Content/css/weui.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/css/mobiscroll-2.13.2.full.min.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/css/jquery-weui.min.css" />
+    <link rel="stylesheet" type="text/css" href="/Content/css/default.css?v=2019071901" />
+</head>
+<body>
+    <header class="header">
+        <a class="logo">
+            <img src="/Content/images/logo.png" />
+        </a>
+        <p class="title">电子发票信息</p>
+        <p class="title-sub"></p>
+    </header>
+    <div class="wrap">
+        <div class="page-spacing">
+            <div class="panel">
+                <div class="panel-heading">
+                    订单信息
+                </div>
+                <div class="panel-body">
+                    <div class="weui-form-preview__bd">
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">订单编号</label>
+                            <span class="weui-form-preview__value">BA43455796</span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">下单时间</label>
+                            <span class="weui-form-preview__value">2020-08-26 14:13:07</span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">发票金额</label>
+                            <span class="weui-form-preview__value prices">&yen; 6661.03</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-heading">
+                    发票类型
+                </div>
+                <div class="panel-body">
+                    <div class="weui-flex order-typewrap">
+                        <div class="order-type order-select">
+                            电子发票
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" id="invoicepanel">
+                <div class="panel-heading">
+                    发票抬头
+                </div>
+                <div class="panel-body">
+                    <div id="tax-div">
+                        <div class="weui-cells weui-cells_radio">
+                            <label class="weui-cell weui-check__label" for="r1">
+                                <div class="weui-cell__bd">个人</div>
+                                <div class="weui-cell__ft">
+                                    <input required type="radio" class="weui-check" name="tax" value="personal" id="r1" checked="checked">
+                                    <span class="weui-icon-checked"></span>
+                                </div>
+                            </label>
+                            <label class="weui-cell weui-check__label" for="r2">
+                                <div class="weui-cell__bd">单位</div>
+                                <div class="weui-cell__ft">
+                                    <input type="radio" name="tax" class="weui-check" value="company" id="r2">
+                                    <span class="weui-icon-checked"></span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <div class="weui-flex">
+                                <input placeholder="发票抬头" type="text" class="form-control" name="invoicetitle" id="invoicetitle" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="weui-flex">
+                                <input placeholder="单位税号" type="text" class="form-control" name="taxnum" id="taxnum" style="display:none;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weui-btn-area">
+                <a class="weui-btn weui-btn_primary btn-blue" href="javascript:" id="btnCommit">申请开票</a>
+            </div>
+
+            <div class="weui-footer margin-top20">
+                <p class="weui-footer__text">Copyright ? 2018-2021 日上免税行</p>
+            </div>
+        </div>
+        <input type="hidden" id="code" value="w1SYx0XHVTsHmRfq9WS1Pn/b65NYEWwx2f8yTIQS+1d/g4CbQ8mS/oBwA0/zv/6aclhIAzZIg5Q83kNilg89A+07ioiHey9eAJmWeL/DA9u+ExUfhQCiUHELfn+Fn+bY7Rjt0K8EOOp6lv/aWXQ7oD9xEnm6UVK2K/RCa0u9sgw=" />
+        <input type="hidden" id="type" value="0" />
+    </div>
+    <div id="loadingToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast" style="visibility:visible;opacity:1;">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">操作中...</p>
+        </div>
+    </div>
+    <script src="/Content/scripts/jquery-2.1.4.js"></script>
+    <script src="/Content/scripts/mobiscroll-2.13.2.full.min.js"></script>
+    <script src="/Content/scripts/jquery-weui.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#ckinvoice").on("change", function () {
+                if ($("#ckinvoice").is(":checked")) {
+                    $("#tax-div").show();
+                    $('#type').val('1');
+                } else {
+                    $("#tax-div").hide();
+                    $('#type').val('0');
+                }
+            });
+            $("#r1").on("click", function () {
+                if (this.checked) {
+                    $("#taxnum").hide();
+                    $('#type').val('0');
+                }
+            });
+            $("#r2").on("click", function () {
+                if (this.checked) {
+                    $("#taxnum").show();
+                    $('#type').val('1');
+                }
+            });
+            $('#btnCommit').on('click', function () {
+                var _name = $('#invoicetitle').val();
+                var _taxNum = $('#taxnum').val();
+                var _type = $('#type').val();
+                var _code = $('#code').val();
+                if (!_name) {
+                    $.alert("请输入发票抬头", "");
+                    return;
+                }
+                if (_type == '1' && !_taxNum) {
+                    $.alert("请输入单位税号", "");
+                    return;
+                }
+                if (!_code) {
+                    $.alert("编号错误,请刷新重试", "");
+                    return;
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/invoice/PostInvoice',
+                    data: {
+                        code: _code,
+                        Type: _type,
+                        Name: _name,
+                        TaxNum:_taxNum
+                    },
+                    beforeSend: function () {
+                        $('#loadingToast').show();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            //提交成功转到查看页面
+                            window.location.href = location.href + '&time=' + ((new Date()).getTime());
+                        } else {
+                            $.alert(result.error, "");
+                        }
+                    },
+                    error: function () {
+                        $.alert('开票失败，请重试', "");
+                    },
+                    complete: function () {
+                        $('#loadingToast').hide();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
